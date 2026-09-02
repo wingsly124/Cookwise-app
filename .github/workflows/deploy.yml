@@ -22,7 +22,7 @@ jobs:
           channel: 'stable'
 
       - name: Install dependencies
-        run: flutter pub get
+        run: flutter pub upgrade
 
       - name: Build Web
         run: flutter build web --base-href "/Cookwise-app/"
