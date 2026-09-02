@@ -16,7 +16,6 @@ dependencies:
   sqflite: ^2.3.0
   path: ^1.8.3
   speech_to_text: ^6.3.0
-  ignore_web: true 
   image_picker: ^1.0.4
   json_annotation: ^4.8.1
   flutter_dotenv: ^5.1.0
