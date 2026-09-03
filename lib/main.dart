@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart'
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-const String supabaseUrl = 'https://cqfvsirstmegqcyoobfi.supabase.co/rest/v1/';
+const String supabaseUrl = 'https://cqfvsirstmegqcyoobfi.supabase.co';
 const String supabaseAnonKey = 'sb_publishable_lJs3-GGfqiBLiTqcanz9mQ_JpmpnfH_';
 
 void main() async {
