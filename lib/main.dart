@@ -71,35 +71,46 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
     try {
       if (_isLoginMode) {
-        if (_isPhoneMode) {
-          await Supabase.instance.client.auth.signInWithPhone(
-            phone: _phoneController.text.trim(),
-            token: _codeController.text.trim(),
-          );
-        } else {
+        // Temporarily hide phone login, keep email/password login only
+        // if (_isPhoneMode) {
+        //   await Supabase.instance.client.auth.signInWithPhone(
+        //     phone: _phoneController.text.trim(),
+        //     token: _codeController.text.trim(),
+        //   );
+        // } else {
           await Supabase.instance.client.auth.signInWithPassword(
             email: _emailController.text.trim(),
             password: _passwordController.text.trim(),
           );
-        }
+        // }
       } else {
         String nickname = _nicknameController.text.trim();
         if (nickname.isEmpty) {
           nickname = _generateRandomNickname();
         }
-        if (_isPhoneMode) {
-          await Supabase.instance.client.auth.signInWithPhone(
-            phone: _phoneController.text.trim(),
-            token: _codeController.text.trim(),
-          );
-        } else {
+        // Temporarily hide phone registration, keep email registration only
+        // if (_isPhoneMode) {
+        //   await Supabase.instance.client.auth.signInWithPhone(
+        //     phone: _phoneController.text.trim(),
+        //     token: _codeController.text.trim(),
+        //   );
+        // } else {
           await Supabase.instance.client.auth.signUp(
             email: _emailController.text.trim(),
             password: _passwordController.text.trim(),
             data: {'nickname': nickname},
           );
-        }
+        // }
       }
+      if (!mounted) return;
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage()));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
       if (!mounted) return;
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage()));
     } catch (e) {
