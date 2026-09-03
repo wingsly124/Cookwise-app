@@ -49,11 +49,11 @@ required this.user_id,
 
 factory Recipe.fromJson(Map<String, dynamic> json) {
 return Recipe(
-id: json['id'] as String,
-title: json['title'] as String,
-ingredients: json['ingredients'] as String,
-steps: json['steps'] as String,
-user_id: json['user_id'] as String,
+id: json['id'] as String? ?? '',
+title: json['title'] as String? ?? '',
+ingredients: json['ingredients'] as String? ?? '',
+steps: json['steps'] as String? ?? '',
+user_id: json['user_id'] as String? ?? '',
 );
 }
 }
