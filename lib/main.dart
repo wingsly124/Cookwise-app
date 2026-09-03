@@ -43,10 +43,7 @@ class CookwiseApp extends StatelessWidget {
           ? const LoginPage()
           : const HomePage(),
     );
-  }
-}
-
-class LoginPage extends StatefulWidget {
+    class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
@@ -71,6 +68,46 @@ class _LoginPageState extends State<LoginPage> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('登录失败: $e')),
+      );
+    }
+    setState(() => _isLoading = false);
+  }
+
+  Future<void> _signUp() async {
+    // 弹出注册对话框
+    final email = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        final emailCtrl = TextEditingController();
+        return AlertDialog(
+          title: const Text('注册新账号'),
+          content: TextField(
+            controller: emailCtrl,
+            decoration: const InputDecoration(labelText: '邮箱', hintText: '输入您的注册邮箱'),
+            autofocus: true,
+            keyboardType: TextInputType.emailAddress,
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('取消')),
+            TextButton(onPressed: () => Navigator.pop(context, emailCtrl.text), child: const Text('发送验证邮件')),
+          ],
+        );
+      },
+    );
+    
+    if (email == null || email.isEmpty) return;
+
+    setState(() => _isLoading = true);
+    try {
+      await Supabase.instance.client.auth.signUp(email: email, password: _passwordController.text.trim());
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('注册成功！请前往邮箱查收验证邮件。')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('注册失败: $e')),
       );
     }
     setState(() => _isLoading = false);
@@ -109,12 +146,29 @@ class _LoginPageState extends State<LoginPage> {
                     : const Text('登录', style: TextStyle(fontSize: 18)),
               ),
             ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: OutlinedButton(
+                onPressed: _isLoading ? null : _signUp,
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Color(0xFFFF7E36)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text('没有账号？去注册', style: TextStyle(color: Color(0xFFFF7E36))),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
+  }
+}
+
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
