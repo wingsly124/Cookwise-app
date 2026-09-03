@@ -41,22 +41,22 @@ class _LoginPageState extends State<LoginPage> {
   final _nicknameController = TextEditingController();
   
   bool _isLoading = false;
-  bool _isLoginMode = true; 
+  bool _isLoginMode = true;
   bool _isPhoneMode = false;
-
+  
   bool get _isPasswordStrong {
     final password = _passwordController.text;
     return RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$').hasMatch(password);
   }
-
+  
   bool get _isEmailValid {
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(_emailController.text.trim());
   }
-
+  
   bool get _isPhoneValid {
     return RegExp(r'^[0-9]{11}$').hasMatch(_phoneController.text.trim());
   }
-
+  
   String _generateRandomNickname() {
     const adjectives = ['Happy', 'Brave', 'Calm', 'Gentle', 'Mighty', 'Proud', 'Quiet'];
     const nouns = ['Lion', 'Eagle', 'Tiger', 'Bear', 'Wolf', 'Falcon', 'Panther'];
@@ -66,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
     final number = random.nextInt(999) + 1;
     return '${adjective}_$noun_$number';
   }
-
+  
   Future<void> _handleAuth() async {
     setState(() => _isLoading = true);
     try {
@@ -111,16 +111,7 @@ class _LoginPageState extends State<LoginPage> {
       if (mounted) setState(() => _isLoading = false);
     }
   }
-      if (!mounted) return;
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage()));
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
+  
   void _toggleMode() {
     setState(() {
       _isLoginMode = !_isLoginMode;
@@ -131,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
       _codeController.clear();
     });
   }
-
+  
   void _toggleAuthType() {
     setState(() {
       _isPhoneMode = !_isPhoneMode;
@@ -142,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
       _nicknameController.clear();
     });
   }
-
+  
   @override
   void dispose() {
     _emailController.dispose();
@@ -152,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
     _nicknameController.dispose();
     super.dispose();
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -236,32 +227,30 @@ class _LoginPageState extends State<LoginPage> {
               ],
               const SizedBox(height: 32),
               ElevatedButton(
-                onPressed: _isLoading
-                    ? null
-                    : () {
-                        if (!_isLoginMode && !_isPhoneMode) {
-                          if (!_isEmailValid) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Invalid email format')),
-                            );
-                            return;
-                          }
-                          if (!_isPasswordStrong) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Password is too weak')),
-                            );
-                            return;
-                          }
-                        } else if (!_isLoginMode && _isPhoneMode) {
-                          if (!_isPhoneValid) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Invalid phone number (11 digits)')),
-                            );
-                            return;
-                          }
-                        }
-                        _handleAuth();
-                      },
+                onPressed: _isLoading ? null : () {
+                  if (!_isLoginMode && !_isPhoneMode) {
+                    if (!_isEmailValid) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Invalid email format')),
+                      );
+                      return;
+                    }
+                    if (!_isPasswordStrong) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Password is too weak')),
+                      );
+                      return;
+                    }
+                  } else if (!_isLoginMode && _isPhoneMode) {
+                    if (!_isPhoneValid) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Invalid phone number (11 digits)')),
+                      );
+                      return;
+                    }
+                  }
+                  _handleAuth();
+                },
                 child: _isLoading
                     ? const SizedBox(
                         height: 20,
@@ -273,9 +262,11 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 16),
               TextButton(
                 onPressed: _toggleMode,
-                child: Text(_isLoginMode
-                    ? 'Don\'t have an account? Sign Up'
-                    : 'Already have an account? Login'),
+                child: Text(
+                  _isLoginMode
+                      ? 'Don\'t have an account? Sign Up'
+                      : 'Already have an account? Login',
+                ),
               ),
             ],
           ),
@@ -287,13 +278,13 @@ class _LoginPageState extends State<LoginPage> {
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
-
+  
   Future<void> _signOut(BuildContext context) async {
     await Supabase.instance.client.auth.signOut();
     if (!context.mounted) return;
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginPage()));
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
