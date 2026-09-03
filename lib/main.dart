@@ -64,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
     final adjective = adjectives[random.nextInt(adjectives.length)];
     final noun = nouns[random.nextInt(nouns.length)];
     final number = random.nextInt(999) + 1;
-    return '${adjective}_$noun_$number';
+    return '${adjective}_$noun$number';
   }
   
   Future<void> _handleAuth() async {
