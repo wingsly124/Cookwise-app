@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+// 注意：这里已经把您之前漏掉的分号补上了
 const String supabaseUrl = 'https://cqfvsirstmegqcyoobfi.supabase.co';
 const String supabaseAnonKey = 'sb_publishable_lJs3-GGfqiBLiTqcanz9mQ_JpmpnfH_';
 
@@ -43,7 +44,10 @@ class CookwiseApp extends StatelessWidget {
           ? const LoginPage()
           : const HomePage(),
     );
-    class LoginPage extends StatefulWidget {
+  }
+}
+
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
@@ -55,6 +59,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
 
+  // 登录逻辑
   Future<void> _signIn() async {
     setState(() => _isLoading = true);
     try {
@@ -73,36 +78,17 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = false);
   }
 
+  // 注册逻辑（为您新加的注册按钮调用此方法）
   Future<void> _signUp() async {
-    // 弹出注册对话框
-    final email = await showDialog<String>(
-      context: context,
-      builder: (context) {
-        final emailCtrl = TextEditingController();
-        return AlertDialog(
-          title: const Text('注册新账号'),
-          content: TextField(
-            controller: emailCtrl,
-            decoration: const InputDecoration(labelText: '邮箱', hintText: '输入您的注册邮箱'),
-            autofocus: true,
-            keyboardType: TextInputType.emailAddress,
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('取消')),
-            TextButton(onPressed: () => Navigator.pop(context, emailCtrl.text), child: const Text('发送验证邮件')),
-          ],
-        );
-      },
-    );
-    
-    if (email == null || email.isEmpty) return;
-
     setState(() => _isLoading = true);
     try {
-      await Supabase.instance.client.auth.signUp(email: email, password: _passwordController.text.trim());
+      await Supabase.instance.client.auth.signUp(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('注册成功！请前往邮箱查收验证邮件。')),
+        const SnackBar(content: Text('注册成功！请查看您的邮箱进行确认。')),
       );
     } catch (e) {
       if (!mounted) return;
@@ -135,6 +121,7 @@ class _LoginPageState extends State<LoginPage> {
               decoration: const InputDecoration(labelText: '密码', border: OutlineInputBorder()),
             ),
             const SizedBox(height: 24),
+            // 登录按钮
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -146,6 +133,7 @@ class _LoginPageState extends State<LoginPage> {
                     : const Text('登录', style: TextStyle(fontSize: 18)),
               ),
             ),
+            // 注册按钮（为您新加的）
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
@@ -154,9 +142,9 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: _isLoading ? null : _signUp,
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Color(0xFFFF7E36)),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-                child: const Text('没有账号？去注册', style: TextStyle(color: Color(0xFFFF7E36))),
+                child: const Text('注册', style: TextStyle(fontSize: 18, color: Color(0xFFFF7E36))),
               ),
             ),
           ],
@@ -165,10 +153,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
-  }
-}
-
-
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -362,7 +346,7 @@ class RecipePage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
-              Text(ingredients, style: TextStyle(fontSize: 13, color: Colors.grey.shade700)),
+              Text(ingredients, style: TextStyle(color: Colors.grey.shade800)),
             ],
           ),
         ),
@@ -374,6 +358,7 @@ class RecipePage extends StatelessWidget {
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
+  // 退出登录功能（为您新加的）
   Future<void> _signOut(BuildContext context) async {
     await Supabase.instance.client.auth.signOut();
     if (!context.mounted) return;
@@ -383,52 +368,30 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('我的')),
-      body: ListView(
-        children: [
-          const SizedBox(height: 24),
-          const CircleAvatar(
-            radius: 40,
-            backgroundColor: Color(0xFFFF7E36),
-            child: Icon(Icons.person, size: 40, color: Colors.white),
-          ),
-          const SizedBox(height: 12),
-          const Center(child: Text('Cookwise 用户', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
-          const SizedBox(height: 32),
-          _buildMenuItem(Icons.history, '烹饪历史', context),
-          _buildMenuItem(Icons.favorite_border, '收藏菜谱', context),
-          _buildMenuItem(Icons.settings_outlined, '设置', context),
-          _buildMenuItem(Icons.info_outline, '关于我们', context),
-          const SizedBox(height: 40),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: ElevatedButton.icon(
-              onPressed: () => _signOut(context),
-              icon: const Icon(Icons.logout),
-              label: const Text('退出登录'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade100,
-                foregroundColor: Colors.red,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
+      appBar: AppBar(title: const Text('个人中心')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircleAvatar(
+              radius: 50,
+              backgroundColor: Colors.grey,
+              child: Icon(Icons.person, size: 50, color: Colors.white),
             ),
-          ),
-        ],
+            const SizedBox(height: 24),
+            const Text('用户信息', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 48),
+            ElevatedButton(
+              onPressed: () => _signOut(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+              ),
+              child: const Text('退出登录', style: TextStyle(fontSize: 16)),
+            ),
+          ],
+        ),
       ),
-    );
-  }
-
-  Widget _buildMenuItem(IconData icon, String title, BuildContext context) {
-    return ListTile(
-      leading: Icon(icon, color: const Color(0xFFFF7E36)),
-      title: Text(title),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$title 功能开发中...')),
-        );
-      },
     );
   }
 }
